@@ -1,4 +1,4 @@
-import { querySnowflakeLongRunning } from "@/lib/snowflake"
+import { querySnowflake } from "@/lib/snowflake"
 export const dynamic = "force-dynamic"
 
 export async function GET(request: Request) {
@@ -13,8 +13,8 @@ export async function GET(request: Request) {
       sql = `
         SELECT c.CALL_ID, c.SENTIMENT,
                c.MP4_FILE_PATH, c.TRANSCRIPTION,
-               SNOWFLAKE.CORTEX.SUMMARIZE(c.TRANSCRIPTION) AS SUMMARY,
-               GET_PRESIGNED_URL(@CUSTOMER_360.PUBLIC.CALL_RECORDINGS_STAGE,
+               COALESCE(c.SUMMARY, 'No summary available') AS SUMMARY,
+               BUILD_SCOPED_FILE_URL(@CUSTOMER_360.PUBLIC.CALL_RECORDINGS_STAGE,
                  REPLACE(c.MP4_FILE_PATH, '@CUSTOMER_360.PUBLIC.CALL_RECORDINGS_STAGE/', '')) AS PRESIGNED_URL,
                g.FULL_NAME
         FROM CUSTOMER_360.PUBLIC.CUSTOMER_CALLS c
@@ -28,8 +28,8 @@ export async function GET(request: Request) {
       sql = `
         SELECT c.CALL_ID, c.SENTIMENT,
                c.MP4_FILE_PATH, c.TRANSCRIPTION,
-               SNOWFLAKE.CORTEX.SUMMARIZE(c.TRANSCRIPTION) AS SUMMARY,
-               GET_PRESIGNED_URL(@CUSTOMER_360.PUBLIC.CALL_RECORDINGS_STAGE,
+               COALESCE(c.SUMMARY, 'No summary available') AS SUMMARY,
+               BUILD_SCOPED_FILE_URL(@CUSTOMER_360.PUBLIC.CALL_RECORDINGS_STAGE,
                  REPLACE(c.MP4_FILE_PATH, '@CUSTOMER_360.PUBLIC.CALL_RECORDINGS_STAGE/', '')) AS PRESIGNED_URL,
                g.FULL_NAME
         FROM CUSTOMER_360.PUBLIC.CUSTOMER_CALLS c
@@ -40,7 +40,7 @@ export async function GET(request: Request) {
     } else {
       return Response.json([])
     }
-    const rows = await querySnowflakeLongRunning(sql)
+    const rows = await querySnowflake(sql)
     return Response.json(rows)
   } catch (e) {
     console.error(new Date().toISOString(), "[recordings]", e)

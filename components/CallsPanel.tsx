@@ -100,7 +100,21 @@ export function CallsPanel({ customerId }: CallsPanelProps) {
                 <div className="card-title" style={{ marginBottom: 12 }}>Sentiment Breakdown</div>
                 <ResponsiveContainer width="100%" height={180}>
                   <PieChart>
-                    <Pie data={sentimentData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label={({ name, value }) => `${name}: ${value}`}>
+                    <Pie
+                      data={sentimentData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={70}
+                      label={({ name, value }) => `${name}: ${value}`}
+                      style={{ cursor: "pointer" }}
+                      onClick={(_, index) => {
+                        const sentiment = sentimentData[index]?.name
+                        const call = calls.find(c => c.SENTIMENT === sentiment)
+                        if (call) setSelectedCallId(call.CALL_ID)
+                      }}
+                    >
                       {sentimentData.map((entry) => (
                         <Cell key={entry.name} fill={SENTIMENT_COLORS[entry.name] || "#5c7080"} />
                       ))}

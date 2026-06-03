@@ -79,9 +79,12 @@ export function RecordingsPanel({ customerId }: RecordingsPanelProps) {
                   <span className={`badge badge-${rec.SENTIMENT.toLowerCase()}`} style={{ marginTop: 4 }}>{rec.SENTIMENT}</span>
                 </div>
                 {rec.PRESIGNED_URL && (
-                  <a href={rec.PRESIGNED_URL} target="_blank" rel="noopener noreferrer" className="btn">
-                    <Play size={14} /> Play Recording
-                  </a>
+                  <audio controls preload="none" style={{ height: 32 }}>
+                    <source src={rec.PRESIGNED_URL} type="audio/mp4" />
+                    <a href={rec.PRESIGNED_URL} target="_blank" rel="noopener noreferrer" className="btn">
+                      <Play size={14} /> Download
+                    </a>
+                  </audio>
                 )}
               </div>
               <div style={{ marginBottom: 12 }}>

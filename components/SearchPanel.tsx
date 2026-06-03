@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
-import { Building, User, Shield, Users, Car, TrendingDown, Activity } from "lucide-react"
+import { Building, User, Shield, Users, Car, TrendingDown, Activity, Mail, Phone, Hash } from "lucide-react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts"
 
 interface SearchResult {
@@ -80,6 +80,9 @@ export function SearchPanel({ onCustomerSelect }: SearchPanelProps) {
   const [companyQuery, setCompanyQuery] = useState("")
   const [selectedCompany, setSelectedCompany] = useState("")
   const [contactQuery, setContactQuery] = useState("")
+  const [emailQuery, setEmailQuery] = useState("")
+  const [phoneQuery, setPhoneQuery] = useState("")
+  const [idQuery, setIdQuery] = useState("")
   const [companySuggestions, setCompanySuggestions] = useState<string[]>([])
   const [contactSuggestions, setContactSuggestions] = useState<ContactOption[]>([])
   const [results, setResults] = useState<SearchResult[]>([])
@@ -172,6 +175,20 @@ export function SearchPanel({ onCustomerSelect }: SearchPanelProps) {
     }
   }
 
+  const searchByField = async (field: "email" | "phone" | "id", value: string) => {
+    setSummary(null)
+    setLoading(true)
+    const res = await fetch(`/api/search?${field}=${encodeURIComponent(value)}`)
+    const data = await res.json()
+    setResults(data)
+    setLoading(false)
+    if (data.length > 0) {
+      setSelectedCustomerId(data[0].MASTER_CUSTOMER_ID)
+      onCustomerSelect?.(data[0].MASTER_CUSTOMER_ID, data[0].FULL_NAME)
+      loadSummary(data[0].MASTER_CUSTOMER_ID)
+    }
+  }
+
   const tierStyle = summary ? TIER_STYLES[summary.tier] || TIER_STYLES.Bronze : null
   const churnStyle = summary?.churn ? CHURN_STYLES[summary.churn.riskLevel] || CHURN_STYLES.Medium : null
 
@@ -233,6 +250,39 @@ export function SearchPanel({ onCustomerSelect }: SearchPanelProps) {
               ))}
             </div>
           )}
+        </div>
+      </div>
+
+      <div className="search-row" style={{ marginTop: 8 }}>
+        <div className="input-group">
+          <label><Mail size={12} /> Email</label>
+          <input
+            type="text"
+            placeholder="e.g. colm@snowflake.com"
+            value={emailQuery}
+            onChange={(e) => setEmailQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && emailQuery.length >= 3 && searchByField("email", emailQuery)}
+          />
+        </div>
+        <div className="input-group">
+          <label><Phone size={12} /> Phone</label>
+          <input
+            type="text"
+            placeholder="e.g. 0872487665"
+            value={phoneQuery}
+            onChange={(e) => setPhoneQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && phoneQuery.length >= 3 && searchByField("phone", phoneQuery)}
+          />
+        </div>
+        <div className="input-group">
+          <label><Hash size={12} /> Global Customer ID</label>
+          <input
+            type="text"
+            placeholder="e.g. MCR-SF-0033r00003hMYRAAA4"
+            value={idQuery}
+            onChange={(e) => setIdQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && idQuery.length >= 3 && searchByField("id", idQuery)}
+          />
         </div>
       </div>
 
