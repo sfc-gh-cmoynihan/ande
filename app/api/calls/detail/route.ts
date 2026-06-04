@@ -1,4 +1,4 @@
-import { querySnowflakeLongRunning } from "@/lib/snowflake"
+import { querySnowflake } from "@/lib/snowflake"
 export const dynamic = "force-dynamic"
 
 export async function GET(request: Request) {
@@ -15,8 +15,8 @@ export async function GET(request: Request) {
       SELECT c.CALL_ID, c.CALL_DATE, c.DURATION_SECONDS, c.AGENT_NAME,
              c.CALL_TYPE, c.SENTIMENT, c.MP4_FILE_PATH, c.TRANSCRIPTION,
              c.MASTER_CUSTOMER_ID,
-             SNOWFLAKE.CORTEX.SUMMARIZE(c.TRANSCRIPTION) AS SUMMARY,
-             GET_PRESIGNED_URL(@CUSTOMER_360.PUBLIC.CALL_RECORDINGS_STAGE,
+             COALESCE(c.SUMMARY, 'No summary available') AS SUMMARY,
+             BUILD_SCOPED_FILE_URL(@CUSTOMER_360.PUBLIC.CALL_RECORDINGS_STAGE,
                REPLACE(c.MP4_FILE_PATH, '@CUSTOMER_360.PUBLIC.CALL_RECORDINGS_STAGE/', '')) AS PRESIGNED_URL,
              g.FULL_NAME
       FROM CUSTOMER_360.PUBLIC.CUSTOMER_CALLS c
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
       WHERE c.CALL_ID = '${safe}'
       LIMIT 1
     `
-    const rows = await querySnowflakeLongRunning(sql)
+    const rows = await querySnowflake(sql)
     if (rows.length === 0) {
       return Response.json({ error: "Call not found" }, { status: 404 })
     }
