@@ -171,13 +171,16 @@ export function CoWorkAgentPanel() {
             onChange={e => setSelectedModel(e.target.value)}
             style={{ width: "100%", fontSize: 12, padding: "8px 10px", border: "1px solid #e0e0e0", borderRadius: 6, background: "#fff", cursor: "pointer" }}
           >
-            <option value="claude-opus-4-8">Claude Opus 4 (Latest)</option>
-            <option value="chatgpt-5-5">ChatGPT 5-5</option>
-            <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
-            <option value="llama3.1-70b">Llama 3.1 70B</option>
-            <option value="snowflake-llama-3.3-70b">Snowflake Llama 3.3 70B</option>
+            <option value="claude-opus-4-8">Claude Opus 4-8 (Default)</option>
+            <option value="claude-opus-4-7">Claude Opus 4-7</option>
+            <option value="openai-gpt-5.2">OpenAI GPT 5.2</option>
+            <option value="openai-gpt-5.1">OpenAI GPT 5.1</option>
+            <option value="gemini-3.1-pro">Gemini 3.1 Pro</option>
+            <option value="llama4-maverick">Llama 4 Maverick</option>
+            <option value="snowflake-llama-3.1-405b">Snowflake Llama 3.1 405B</option>
+            <option value="deepseek-r1">DeepSeek R1</option>
             <option value="mistral-large2">Mistral Large 2</option>
-            <option value="llama3.1-8b">Llama 3.1 8B (Fastest)</option>
+            <option value="mixtral-8x7b">Mixtral 8x7B</option>
           </select>
         </div>
         <div style={{ fontSize: 11, color: "#6c757d", textTransform: "uppercase", marginBottom: 8, fontWeight: 600 }}>Sample Questions</div>

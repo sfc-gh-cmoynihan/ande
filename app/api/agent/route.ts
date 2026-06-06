@@ -55,9 +55,11 @@ SQL:`
     if (!rows || rows.length === 0) return null
 
     let sql = (rows[0].SQL_QUERY || "").trim()
-    sql = sql.replace(/^```sql\s*/i, "").replace(/```\s*$/, "").trim()
+    sql = sql.replace(/<think>[\s\S]*?<\/think>/gi, "").trim()
+    sql = sql.replace(/^```sql\s*/i, "").replace(/```\s*$/, "").replace(/```/g, "").trim()
     const sqlMatch = sql.match(/(?:^|\n)((?:SELECT|WITH)\b[\s\S]*?)(;|$)/i)
     if (sqlMatch) sql = sqlMatch[1].trim()
+    sql = sql.replace(/;$/, "").trim()
     if (sql.toUpperCase().startsWith("SELECT") || sql.toUpperCase().startsWith("WITH")) {
       if (!sql.includes("LIMIT")) sql += " LIMIT 20"
 
