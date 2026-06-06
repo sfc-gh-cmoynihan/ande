@@ -31,9 +31,11 @@ export default function Home() {
     <div className="app-container">
       <aside className="sidebar">
         <div className="sidebar-header">
-          <img src="/logo.png" alt="Customer 360" style={{ height: 36, marginBottom: 8 }} />
-          <h1>Customer 360</h1>
-          <p>Master Record Search <span style={{ fontSize: 10, color: "var(--text-muted)" }}>v3</span></p>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+            <h1>Customer 360</h1>
+            <span style={{ fontSize: 11, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>v3.1</span>
+          </div>
+          <p>Master Record Search</p>
         </div>
         {selectedCustomerName && (
           <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--border)", fontSize: 12 }}>
