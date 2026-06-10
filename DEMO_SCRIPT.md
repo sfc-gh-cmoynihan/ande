@@ -175,7 +175,77 @@ ORDER BY ACTIVITY_DATE;
 
 ---
 
-### 7. Technical Deep-Dive (optional, 2 minutes)
+### 7. dbt Transformation Pipeline & Column Lineage (2 minutes)
+
+> "Let me show you how the data gets from raw landing to matched golden record — using a dbt project deployed natively in Snowflake."
+
+**Action:** Open Snowsight → Data → CUSTOMER_360 → Show the schema layers:
+
+```
+RAW → CLEANSED → MATCHED → PUBLIC (Golden)
+```
+
+> "We have a dbt project called `C360_DBT` that runs entirely inside Snowflake. It implements a 4-layer architecture:"
+
+**Action:** Run in worksheet:
+
+```sql
+-- Show the dbt project
+SHOW DBT PROJECTS IN SCHEMA CUSTOMER_360.PUBLIC;
+
+-- Execute the pipeline
+EXECUTE DBT PROJECT CUSTOMER_360.PUBLIC.C360_DBT ARGS='run';
+```
+
+> "The pipeline starts with raw SAP and Salesforce data — notice the SAP record has 'Collum Moynihan' — a misspelling:"
+
+```sql
+-- Raw SAP landing: notice 'Collum' misspelling
+SELECT KUNNR, NAME2, NAME1, BAHNE AS EMAIL 
+FROM CUSTOMER_360.RAW.RAW_SAP_KNA1
+WHERE NAME1 = 'Moynihan';
+```
+
+> "Through the cleansing layer, names are standardised (InitCap, trimmed), phones normalised to +353 format, emails lowercased."
+
+```sql
+-- Cleansed: standardised but original name preserved
+SELECT source_id, full_name, email, phone_normalised
+FROM CUSTOMER_360.PUBLIC_CLEANSED.CLEANSED_SAP_CUSTOMERS;
+```
+
+> "Now the magic — Jaro-Winkler fuzzy matching. Watch how 'Collum Moynihan' matches to 'Colm Moynihan' with a 96% name similarity score:"
+
+```sql
+-- Fuzzy match results: Collum → Colm at 96% name score
+SELECT sap_name, sf_name, name_score, email_score, weighted_score, match_type
+FROM CUSTOMER_360.PUBLIC_MATCHED.MATCH_CLUSTERS_JARO
+WHERE sap_name LIKE '%Moynihan%' OR sf_name LIKE '%Moynihan%'
+ORDER BY weighted_score DESC;
+```
+
+**Key talking points:**
+- **"Collum Moynihan" → "Colm Moynihan"**: Jaro-Winkler name_score = **96** (despite the misspelling)
+- Email exact match (100) boosts it to weighted_score = 91.8
+- Match type classified as `EXACT_EMAIL` — confirming high confidence
+- The same email `colm.moynihan@snowflake.com` bridges the SAP and Salesforce records
+
+> "Column-level lineage traces from RAW_SAP_KNA1.NAME1 (last name) + NAME2 (first name) → through cleansed concatenation → into the Jaro-Winkler comparison → and finally the golden record selection."
+
+**Action:** Show lineage (Data → CUSTOMER_360 → PUBLIC_MATCHED → MATCH_CLUSTERS_JARO → Lineage tab):
+
+```
+RAW_SAP_KNA1.NAME1 + NAME2 → stg_sap_customers.full_name 
+  → cleansed_sap_customers.full_name 
+    → match_clusters_jaro.sap_name / name_score
+      → customer_golden_record.full_name
+```
+
+> "This is true columnar lineage — you can trace exactly which SAP field contributed to the final golden name. And it's all governed, auditable, in Snowflake."
+
+---
+
+### 8. Technical Deep-Dive (optional, 2 minutes)
 
 > "Under the hood, the matching pipeline works in three stages:"
 

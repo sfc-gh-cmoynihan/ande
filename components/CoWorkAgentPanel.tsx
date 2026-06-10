@@ -6,6 +6,33 @@ interface Message {
   content: string
 }
 
+const MODELS = [
+  { value: "claude-opus-4-8", label: "Claude Opus 4-8 (Default)" },
+  { value: "claude-sonnet-4-6", label: "Claude Sonnet 4-6" },
+  { value: "gemini-3.1-pro", label: "Gemini 3.1 Pro" },
+  { value: "llama4-maverick", label: "Llama 4 Maverick" },
+  { value: "llama4-scout", label: "Llama 4 Scout" },
+  { value: "snowflake-llama-3.3-70b", label: "Snowflake Llama 3.3 70B" },
+  { value: "openai-gpt-5.2", label: "OpenAI GPT 5.2" },
+  { value: "openai-gpt-5.1", label: "OpenAI GPT 5.1" },
+  { value: "deepseek-r1", label: "DeepSeek R1" },
+  { value: "mistral-large2", label: "Mistral Large 2" },
+  { value: "mixtral-8x7b", label: "Mixtral 8x7B" },
+]
+
+const SAMPLE_QUESTIONS = [
+  "What is the total value of all active contracts?",
+  "Show me contracts expiring in the next 30 days",
+  "Which contracts have the highest value?",
+  "What is the sentiment breakdown across all calls?",
+  "How many calls had negative sentiment?",
+  "Show me top 10 customers by contract value",
+  "Which customers have the most source records?",
+  "Which customers have negative call sentiment?",
+  "Which customers have expired contracts?",
+  "Find all contracts signed by Colm Moynihan",
+]
+
 function FormattedAnswer({ content }: { content: string }) {
   if (!content.includes("|")) {
     const parts = content.split(/\*\*(.*?)\*\*/g)
@@ -19,12 +46,30 @@ function FormattedAnswer({ content }: { content: string }) {
   }
 
   const lines = content.trim().split("\n").filter(l => l.trim())
-  if (lines.length < 3 || !lines[0].includes("|")) {
-    return <div style={{ whiteSpace: "pre-wrap" }}>{content}</div>
+  const metaLines: string[] = []
+  let tableStart = 0
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].includes("|") && !lines[i].startsWith("**")) {
+      tableStart = i
+      break
+    }
+    metaLines.push(lines[i])
   }
 
-  const headers = lines[0].split("|").map(h => h.trim()).filter(Boolean)
-  const dataLines = lines.slice(2)
+  const tableLines = lines.slice(tableStart).filter(l => l.includes("|"))
+  if (tableLines.length < 3) {
+    const parts = content.split(/\*\*(.*?)\*\*/g)
+    return (
+      <div>
+        {parts.map((part, i) =>
+          i % 2 === 1 ? <strong key={i}>{part}</strong> : <span key={i}>{part}</span>
+        )}
+      </div>
+    )
+  }
+
+  const headers = tableLines[0].split("|").map(h => h.trim()).filter(Boolean)
+  const dataLines = tableLines.slice(2)
 
   const formatHeader = (h: string) => h.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())
   const formatValue = (v: string, col: string) => {
@@ -52,6 +97,20 @@ function FormattedAnswer({ content }: { content: string }) {
 
   return (
     <div>
+      {metaLines.length > 0 && (
+        <div style={{ marginBottom: 8 }}>
+          {metaLines.map((line, i) => {
+            const parts = line.split(/\*\*(.*?)\*\*/g)
+            return (
+              <div key={i} style={{ fontSize: 11, color: "#6b7280", marginBottom: 2 }}>
+                {parts.map((part, j) =>
+                  j % 2 === 1 ? <strong key={j} style={{ color: "#374151" }}>{part}</strong> : <span key={j}>{part}</span>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
       <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 8 }}>{dataLines.length} result{dataLines.length !== 1 ? "s" : ""}</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {dataLines.map((line, ri) => {
@@ -77,19 +136,6 @@ function FormattedAnswer({ content }: { content: string }) {
     </div>
   )
 }
-
-const SAMPLE_QUESTIONS = [
-  "What is the total value of all active contracts?",
-  "Show me contracts expiring in the next 30 days",
-  "Which contracts have the highest value?",
-  "What is the sentiment breakdown across all calls?",
-  "How many calls had negative sentiment?",
-  "Show me top 10 customers by contract value",
-  "Which customers have the most source records?",
-  "Which customers have negative call sentiment?",
-  "Which customers have expired contracts?",
-  "Find all contracts signed by Colm Moynihan",
-]
 
 export function CoWorkAgentPanel() {
   const [messages, setMessages] = useState<Message[]>([])
@@ -130,11 +176,33 @@ export function CoWorkAgentPanel() {
               Ask a question about customers, contracts, calls, or web activity
             </div>
           )}
-          {messages.map((msg, i) => (
-            <div key={i} style={{ marginBottom: 16, padding: "12px 16px", borderRadius: 8, maxWidth: msg.role === "user" ? "80%" : "95%", fontSize: 14, lineHeight: 1.6, ...(msg.role === "user" ? { background: "#3b82f6", color: "#fff", marginLeft: "auto", whiteSpace: "pre-wrap" } : { background: "#f8f9fa", color: "#1a1a2e", border: "1px solid #e0e0e0" }) }}>
-              {msg.role === "assistant" ? <FormattedAnswer content={msg.content} /> : msg.content}
-            </div>
-          ))}
+          {messages.map((msg, i) => {
+            if (msg.role === "user") {
+              return (
+                <div key={i} style={{ marginBottom: 16, padding: "12px 16px", borderRadius: 8, maxWidth: "80%", fontSize: 14, lineHeight: 1.6, background: "#3b82f6", color: "#fff", marginLeft: "auto", whiteSpace: "pre-wrap" }}>
+                  {msg.content}
+                </div>
+              )
+            }
+            const parts = msg.content.split("\n\n")
+            const hasMetadata = parts[0]?.includes("**Model:**")
+            const metaLine = hasMetadata ? parts[0] : null
+            const answerContent = hasMetadata ? parts.slice(1).join("\n\n") : msg.content
+            return (
+              <div key={i} style={{ marginBottom: 16, maxWidth: "95%" }}>
+                {metaLine && (
+                  <div style={{ padding: "8px 12px", marginBottom: 6, background: "#eef2ff", border: "1px solid #c7d2fe", borderRadius: 6, fontSize: 11, color: "#4338ca" }}>
+                    {metaLine.split(/\*\*(.*?)\*\*/g).map((part, j) =>
+                      j % 2 === 1 ? <strong key={j}>{part}</strong> : <span key={j}>{part}</span>
+                    )}
+                  </div>
+                )}
+                <div style={{ padding: "12px 16px", borderRadius: 8, fontSize: 14, lineHeight: 1.6, background: "#f8f9fa", color: "#1a1a2e", border: "1px solid #e0e0e0" }}>
+                  <FormattedAnswer content={answerContent} />
+                </div>
+              </div>
+            )
+          })}
           {loading && <div style={{ padding: "12px 16px", borderRadius: 8, background: "#f1f3f5", color: "#6c757d", maxWidth: "80%" }}>Thinking...</div>}
           <div ref={messagesEndRef} />
         </div>
@@ -171,16 +239,9 @@ export function CoWorkAgentPanel() {
             onChange={e => setSelectedModel(e.target.value)}
             style={{ width: "100%", fontSize: 12, padding: "8px 10px", border: "1px solid #e0e0e0", borderRadius: 6, background: "#fff", cursor: "pointer" }}
           >
-            <option value="claude-opus-4-8">Claude Opus 4-8 (Default)</option>
-            <option value="claude-opus-4-7">Claude Opus 4-7</option>
-            <option value="openai-gpt-5.2">OpenAI GPT 5.2</option>
-            <option value="openai-gpt-5.1">OpenAI GPT 5.1</option>
-            <option value="gemini-3.1-pro">Gemini 3.1 Pro</option>
-            <option value="llama4-maverick">Llama 4 Maverick</option>
-            <option value="snowflake-llama-3.1-405b">Snowflake Llama 3.1 405B</option>
-            <option value="deepseek-r1">DeepSeek R1</option>
-            <option value="mistral-large2">Mistral Large 2</option>
-            <option value="mixtral-8x7b">Mixtral 8x7B</option>
+            {MODELS.map(m => (
+              <option key={m.value} value={m.value}>{m.label}</option>
+            ))}
           </select>
         </div>
         <div style={{ fontSize: 11, color: "#6c757d", textTransform: "uppercase", marginBottom: 8, fontWeight: 600 }}>Sample Questions</div>

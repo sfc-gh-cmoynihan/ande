@@ -58,7 +58,7 @@ export function VersionsPanel({ customerId }: VersionsPanelProps) {
   return (
     <div>
       <div className="page-header">
-        <h2>All Versions</h2>
+        <h2>Duplicate Records</h2>
         <p>View all source system records for a customer cluster</p>
       </div>
 
