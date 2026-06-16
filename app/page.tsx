@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { Search, Users, Phone, Headphones, FileText, Bot, GitBranch, LogOut } from "lucide-react"
+import { Search, Users, Phone, Headphones, FileText, Bot, GitBranch, LogOut, LayoutDashboard } from "lucide-react"
 import { SearchPanel } from "@/components/SearchPanel"
 import { VersionsPanel } from "@/components/VersionsPanel"
 import { CallsPanel } from "@/components/CallsPanel"
@@ -8,8 +8,10 @@ import { RecordingsPanel } from "@/components/RecordingsPanel"
 import { ContractsPanel } from "@/components/ContractsPanel"
 import { CoWorkAgentPanel } from "@/components/CoWorkAgentPanel"
 import { MappingsPanel } from "@/components/MappingsPanel"
+import { DashboardPanel } from "@/components/DashboardPanel"
 
 const NAV_ITEMS = [
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "search", label: "Search", icon: Search },
   { id: "versions", label: "Duplicate Records", icon: Users },
   { id: "calls", label: "Support Calls", icon: Phone },
@@ -22,7 +24,7 @@ const NAV_ITEMS = [
 const LOGIN_TIME = new Date().toLocaleString("en-GB", { timeZone: "Europe/London", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false })
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState("search")
+  const [activeTab, setActiveTab] = useState("dashboard")
   const [selectedCustomerId, setSelectedCustomerId] = useState("")
   const [selectedCustomerName, setSelectedCustomerName] = useState("")
 
@@ -39,7 +41,7 @@ export default function Home() {
             <h1>Customer 360</h1>
             <span style={{ fontSize: 11, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>v4.3</span>
           </div>
-          <p>Master Record Search</p>
+          <p>Snowflake Insurance App</p>
         </div>
         {selectedCustomerName && (
           <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--border)", fontSize: 12 }}>
@@ -75,13 +77,14 @@ export default function Home() {
         </div>
       </aside>
       <main className="main-content">
+        {activeTab === "dashboard" && <DashboardPanel />}
         {activeTab === "search" && <SearchPanel onCustomerSelect={handleCustomerSelect} />}
         {activeTab === "versions" && <VersionsPanel customerId={selectedCustomerId} />}
         {activeTab === "calls" && <CallsPanel customerId={selectedCustomerId} />}
         {activeTab === "recordings" && <RecordingsPanel customerId={selectedCustomerId} />}
         {activeTab === "contracts" && <ContractsPanel customerId={selectedCustomerId} />}
-        {activeTab === "agent" && <CoWorkAgentPanel />}
         {activeTab === "mappings" && <MappingsPanel />}
+        {activeTab === "agent" && <CoWorkAgentPanel />}
       </main>
     </div>
   )
