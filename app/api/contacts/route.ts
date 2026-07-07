@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     }
     const rows = await querySnowflake(`
       SELECT DISTINCT FULL_NAME, 'Snowflake Inc' AS SF_ACCOUNT_NAME, MASTER_CUSTOMER_ID
-      FROM CUSTOMER_360.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE
+      FROM ANDE_DB.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE
       WHERE ${conds}${companyCond}
       ORDER BY FULL_NAME
       LIMIT 50

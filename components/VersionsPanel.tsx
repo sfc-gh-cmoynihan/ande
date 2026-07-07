@@ -20,9 +20,10 @@ interface VersionRecord {
 
 interface VersionsPanelProps {
   customerId?: string
+  embedded?: boolean
 }
 
-export function VersionsPanel({ customerId }: VersionsPanelProps) {
+export function VersionsPanel({ customerId, embedded }: VersionsPanelProps) {
   const [idInput, setIdInput] = useState(customerId || "")
   const [nameInput, setNameInput] = useState("")
   const [records, setRecords] = useState<VersionRecord[]>([])
@@ -57,26 +58,30 @@ export function VersionsPanel({ customerId }: VersionsPanelProps) {
 
   return (
     <div>
-      <div className="page-header">
-        <h2>Duplicate Records</h2>
-        <p>View all source system records for a customer cluster</p>
-      </div>
-
-      <div className="card">
-        <div className="search-row">
-          <div className="input-group">
-            <label>Master Customer ID</label>
-            <input type="text" placeholder="e.g. MCR-00009001" value={idInput} onChange={(e) => setIdInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doSearch()} />
-          </div>
-          <div className="input-group">
-            <label>Or search by name</label>
-            <input type="text" placeholder="e.g. Colm Moynihan" value={nameInput} onChange={(e) => setNameInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doSearch()} />
-          </div>
+      {!embedded && (
+        <div className="page-header">
+          <h2>Duplicate Records</h2>
+          <p>View all source system records for a customer cluster</p>
         </div>
-        <button className="btn btn-primary" onClick={doSearch}>
-          <Users size={14} /> Search Versions
-        </button>
-      </div>
+      )}
+
+      {!embedded && (
+        <div className="card">
+          <div className="search-row">
+            <div className="input-group">
+              <label>Master Customer ID</label>
+              <input type="text" placeholder="e.g. MCR-00009001" value={idInput} onChange={(e) => setIdInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doSearch()} />
+            </div>
+            <div className="input-group">
+              <label>Or search by name</label>
+              <input type="text" placeholder="e.g. Colm Moynihan" value={nameInput} onChange={(e) => setNameInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doSearch()} />
+            </div>
+          </div>
+          <button className="btn btn-primary" onClick={doSearch}>
+            <Users size={14} /> Search Versions
+          </button>
+        </div>
+      )}
 
       {loading && <div className="loading"><div className="spinner" /> Loading versions...</div>}
 

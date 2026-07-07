@@ -20,7 +20,7 @@ export async function GET(request: Request) {
       rows = await querySnowflake(`
         SELECT MASTER_CUSTOMER_ID, FULL_NAME, 'Snowflake Inc' AS SF_ACCOUNT_NAME, EMAIL, PHONE,
                CITY, COUNTRY, PPSN_SSN, TITLE, RECORD_COUNT
-        FROM CUSTOMER_360.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE
+        FROM ANDE_DB.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE
         WHERE ${companyCond}
         ORDER BY FULL_NAME
         LIMIT 100
@@ -30,7 +30,7 @@ export async function GET(request: Request) {
       rows = await querySnowflake(`
         SELECT MASTER_CUSTOMER_ID, FULL_NAME, SF_ACCOUNT_NAME, EMAIL, PHONE,
                CITY, COUNTRY, PPSN_SSN, TITLE, RECORD_COUNT
-        FROM CUSTOMER_360.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE
+        FROM ANDE_DB.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE
         WHERE MASTER_CUSTOMER_ID = '${safe}'
       `)
     } else if (email) {
@@ -38,7 +38,7 @@ export async function GET(request: Request) {
       rows = await querySnowflake(`
         SELECT MASTER_CUSTOMER_ID, FULL_NAME, SF_ACCOUNT_NAME, EMAIL, PHONE,
                CITY, COUNTRY, PPSN_SSN, TITLE, RECORD_COUNT
-        FROM CUSTOMER_360.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE
+        FROM ANDE_DB.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE
         WHERE UPPER(EMAIL) LIKE '%${safe.toUpperCase()}%'
         ORDER BY FULL_NAME
         LIMIT 50
@@ -48,7 +48,7 @@ export async function GET(request: Request) {
       rows = await querySnowflake(`
         SELECT MASTER_CUSTOMER_ID, FULL_NAME, SF_ACCOUNT_NAME, EMAIL, PHONE,
                CITY, COUNTRY, PPSN_SSN, TITLE, RECORD_COUNT
-        FROM CUSTOMER_360.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE
+        FROM ANDE_DB.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE
         WHERE REGEXP_REPLACE(PHONE, '[^0-9]', '') LIKE '%${digits}%'
            OR REGEXP_REPLACE(MOBILE_PHONE, '[^0-9]', '') LIKE '%${digits}%'
         ORDER BY FULL_NAME
@@ -59,7 +59,7 @@ export async function GET(request: Request) {
       rows = await querySnowflake(`
         SELECT MASTER_CUSTOMER_ID, FULL_NAME, SF_ACCOUNT_NAME, EMAIL, PHONE,
                CITY, COUNTRY, PPSN_SSN, TITLE, RECORD_COUNT
-        FROM CUSTOMER_360.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE
+        FROM ANDE_DB.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE
         WHERE UPPER(MASTER_CUSTOMER_ID) LIKE '%${safe.toUpperCase()}%'
         ORDER BY FULL_NAME
         LIMIT 50

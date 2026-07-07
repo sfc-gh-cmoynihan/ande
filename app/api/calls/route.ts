@@ -3,35 +3,32 @@ export const dynamic = "force-dynamic"
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  const id = searchParams.get("id")
+  const agent = searchParams.get("agent")
   const name = searchParams.get("name")
 
   try {
-    let sql = ""
-    if (id) {
-      const safe = id.replace(/'/g, "''")
-      sql = `
-        SELECT c.CALL_ID, c.CALL_DATE, c.DURATION_SECONDS, c.AGENT_NAME,
-               c.CALL_TYPE, c.SENTIMENT, c.MP4_FILE_PATH, c.TRANSCRIPTION, g.FULL_NAME
-        FROM CUSTOMER_360.PUBLIC.CUSTOMER_CALLS c
-        JOIN CUSTOMER_360.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE g ON c.MASTER_CUSTOMER_ID = g.MASTER_CUSTOMER_ID
-        WHERE c.MASTER_CUSTOMER_ID = '${safe}'
-        ORDER BY c.CALL_DATE DESC
-      `
-    } else if (name) {
-      const words = name.replace(/'/g, "''").toUpperCase().split(/\s+/)
-      const conds = words.map((w) => `UPPER(g.FULL_NAME) LIKE '%${w}%'`).join(" AND ")
-      sql = `
-        SELECT c.CALL_ID, c.CALL_DATE, c.DURATION_SECONDS, c.AGENT_NAME,
-               c.CALL_TYPE, c.SENTIMENT, c.MP4_FILE_PATH, c.TRANSCRIPTION, g.FULL_NAME
-        FROM CUSTOMER_360.PUBLIC.CUSTOMER_CALLS c
-        JOIN CUSTOMER_360.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE g ON c.MASTER_CUSTOMER_ID = g.MASTER_CUSTOMER_ID
-        WHERE ${conds}
-        ORDER BY c.CALL_DATE DESC
-      `
-    } else {
-      return Response.json([])
+    const conditions: string[] = []
+    if (agent) {
+      const safe = agent.replace(/'/g, "''").toUpperCase()
+      conditions.push(`UPPER(c.AGENT_NAME) LIKE '%${safe}%'`)
     }
+    if (name) {
+      const words = name.replace(/'/g, "''").toUpperCase().split(/\s+/)
+      const nameConds = words.map((w) => `UPPER(FULL_NAME) LIKE '%${w}%'`).join(" AND ")
+      conditions.push(`c.MASTER_CUSTOMER_ID IN (SELECT MASTER_CUSTOMER_ID FROM ANDE_DB.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE WHERE ${nameConds} LIMIT 5)`)
+    }
+
+    const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : ""
+
+    const sql = `
+      SELECT c.CALL_ID, c.CALL_DATE, c.DURATION_SECONDS, c.AGENT_NAME,
+             c.CALL_TYPE, c.SENTIMENT, c.SUMMARY, c.TRANSCRIPTION, c.MP4_FILE_PATH,
+             c.MASTER_CUSTOMER_ID
+      FROM ANDE_DB.PUBLIC.CUSTOMER_CALLS c
+      ${where}
+      ORDER BY c.CALL_DATE DESC
+      LIMIT 50
+    `
     const rows = await querySnowflake(sql)
     return Response.json(rows)
   } catch (e) {

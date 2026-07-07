@@ -1,32 +1,44 @@
 "use client"
-import { useState } from "react"
-import { Search, Users, Phone, Headphones, FileText, Bot, GitBranch, LogOut, LayoutDashboard } from "lucide-react"
-import { SearchPanel } from "@/components/SearchPanel"
-import { VersionsPanel } from "@/components/VersionsPanel"
-import { CallsPanel } from "@/components/CallsPanel"
-import { RecordingsPanel } from "@/components/RecordingsPanel"
-import { ContractsPanel } from "@/components/ContractsPanel"
-import { CoWorkAgentPanel } from "@/components/CoWorkAgentPanel"
-import { MappingsPanel } from "@/components/MappingsPanel"
-import { DashboardPanel } from "@/components/DashboardPanel"
+import { useState, useEffect, Suspense, lazy } from "react"
+import { Search, Phone, Bot, LayoutDashboard, AlertCircle, Car, Activity, ShieldAlert } from "lucide-react"
+
+const DashboardPanel = lazy(() => import("@/components/DashboardPanel").then(m => ({ default: m.DashboardPanel })))
+const SearchPanel = lazy(() => import("@/components/SearchPanel").then(m => ({ default: m.SearchPanel })))
+const CallsPanel = lazy(() => import("@/components/CallsPanel").then(m => ({ default: m.CallsPanel })))
+const RecordingsPanel = lazy(() => import("@/components/RecordingsPanel").then(m => ({ default: m.RecordingsPanel })))
+const ContractsPanel = lazy(() => import("@/components/ContractsPanel").then(m => ({ default: m.ContractsPanel })))
+const CoWorkAgentPanel = lazy(() => import("@/components/CoWorkAgentPanel").then(m => ({ default: m.CoWorkAgentPanel })))
+const DocumentSearchPanel = lazy(() => import("@/components/DocumentSearchPanel").then(m => ({ default: m.DocumentSearchPanel })))
+const ContactCentrePanel = lazy(() => import("@/components/ContactCentrePanel").then(m => ({ default: m.ContactCentrePanel })))
+const CallGovernancePanel = lazy(() => import("@/components/CallGovernancePanel").then(m => ({ default: m.CallGovernancePanel })))
 
 const NAV_ITEMS = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "search", label: "Search", icon: Search },
-  { id: "versions", label: "Duplicate Records", icon: Users },
-  { id: "calls", label: "Support Calls", icon: Phone },
-  { id: "recordings", label: "Recordings", icon: Headphones },
-  { id: "contracts", label: "Contracts", icon: FileText },
-  { id: "mappings", label: "Mappings", icon: GitBranch },
+  { id: "dashboard", label: "Home", icon: LayoutDashboard },
+  { id: "search", label: "Customer", icon: Search },
+  { id: "contact-centre", label: "Call Analytics", icon: Activity },
+  { id: "calls", label: "Calls by Agent", icon: Phone },
+  { id: "governance", label: "Red Flags", icon: ShieldAlert },
+  { id: "contracts", label: "Policies", icon: Car },
+  { id: "claims", label: "Claims", icon: AlertCircle },
   { id: "agent", label: "Agent", icon: Bot },
 ]
 
-const LOGIN_TIME = new Date().toLocaleString("en-GB", { timeZone: "Europe/London", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false })
+function LoadingSpinner() {
+  return <div style={{ padding: 60, textAlign: "center", color: "#64748b" }}>Loading...</div>
+}
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("dashboard")
   const [selectedCustomerId, setSelectedCustomerId] = useState("")
   const [selectedCustomerName, setSelectedCustomerName] = useState("")
+  const [currentTime, setCurrentTime] = useState("")
+
+  useEffect(() => {
+    const update = () => setCurrentTime(new Date().toLocaleString("en-IE", { dateStyle: "medium", timeStyle: "short" }))
+    update()
+    const interval = setInterval(update, 60000)
+    return () => clearInterval(interval)
+  }, [])
 
   const handleCustomerSelect = (id: string, name: string) => {
     setSelectedCustomerId(id)
@@ -34,57 +46,74 @@ export default function Home() {
   }
 
   return (
-    <div className="app-container">
-      <aside className="sidebar">
-        <div className="sidebar-header">
-          <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-            <h1>Customer 360</h1>
-            <span style={{ fontSize: 11, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>v4.3</span>
-          </div>
-          <p>Snowflake Insurance App</p>
+    <div style={{ minHeight: "100vh", background: "var(--bg-primary)" }}>
+      <header style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 0,
+        padding: "0 24px",
+        height: 56,
+        background: "#fff",
+        borderBottom: "1px solid var(--border)",
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+      }}>
+        <img src="/ande-logo.png" alt="AND.e" style={{ height: 28, marginRight: 12 }} />
+        <div style={{ display: "flex", flexDirection: "column", marginRight: 28, lineHeight: 1.3 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: "var(--text-primary)" }}>Colm Moynihan</span>
+          <span style={{ fontSize: 10, color: "#94a3b8", fontFamily: "monospace" }}>{currentTime}</span>
         </div>
-        {selectedCustomerName && (
-          <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--border)", fontSize: 12 }}>
-            <div style={{ color: "var(--text-muted)", marginBottom: 2 }}>SELECTED</div>
-            <div style={{ color: "var(--accent)", fontWeight: 600 }}>{selectedCustomerName}</div>
-            <div style={{ color: "var(--text-muted)", fontFamily: "var(--font-mono)", fontSize: 10 }}>{selectedCustomerId}</div>
-          </div>
-        )}
-        <nav>
+        <nav style={{ display: "flex", alignItems: "center", gap: 4, flex: 1 }}>
           {NAV_ITEMS.map((item) => (
             <button
               key={item.id}
-              className={`nav-item ${activeTab === item.id ? "active" : ""}`}
               onClick={() => setActiveTab(item.id)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "8px 14px",
+                borderRadius: 6,
+                border: activeTab === item.id ? "1px solid var(--accent)" : "1px solid transparent",
+                background: activeTab === item.id ? "rgba(0, 120, 120, 0.06)" : "transparent",
+                color: activeTab === item.id ? "var(--accent)" : "var(--text-secondary)",
+                fontSize: 13,
+                fontWeight: activeTab === item.id ? 600 : 500,
+                cursor: "pointer",
+                transition: "all 0.15s",
+                whiteSpace: "nowrap",
+              }}
             >
-              <item.icon size={18} />
+              <item.icon size={15} />
               {item.label}
             </button>
           ))}
         </nav>
-        <div style={{ marginTop: "auto", padding: "16px 20px", borderTop: "1px solid var(--border)" }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)", marginBottom: 2 }}>Colm Moynihan</div>
-          <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 10 }}>Logged in: {LOGIN_TIME} BST</div>
-          <button
-            onClick={() => { document.cookie.split(";").forEach(c => { const name = c.split("=")[0].trim(); document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"; document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" + window.location.hostname; }); window.location.replace("https://app.snowflake.com/sfseeurope-ie-demo10") }}
-            style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "8px 12px", background: "none", border: "1px solid var(--border)", borderRadius: 6, fontSize: 12, color: "var(--text-muted)", cursor: "pointer", transition: "all 0.2s" }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = "#dc2626"; e.currentTarget.style.color = "#dc2626" }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-muted)" }}
-          >
-            <LogOut size={14} />
-            Logout
-          </button>
-        </div>
-      </aside>
-      <main className="main-content">
-        {activeTab === "dashboard" && <DashboardPanel />}
-        {activeTab === "search" && <SearchPanel onCustomerSelect={handleCustomerSelect} />}
-        {activeTab === "versions" && <VersionsPanel customerId={selectedCustomerId} />}
-        {activeTab === "calls" && <CallsPanel customerId={selectedCustomerId} />}
-        {activeTab === "recordings" && <RecordingsPanel customerId={selectedCustomerId} />}
-        {activeTab === "contracts" && <ContractsPanel customerId={selectedCustomerId} />}
-        {activeTab === "mappings" && <MappingsPanel />}
-        {activeTab === "agent" && <CoWorkAgentPanel />}
+        <span style={{ fontSize: 11, color: "#64748b", fontFamily: "monospace", whiteSpace: "nowrap" }}>v6.21</span>
+      </header>
+      <main style={{ padding: 24, maxWidth: 1400, margin: "0 auto" }}>
+        <Suspense fallback={<LoadingSpinner />}>
+          {activeTab === "dashboard" && <DashboardPanel />}
+          {activeTab === "search" && (
+            <>
+              <SearchPanel onCustomerSelect={handleCustomerSelect} />
+            </>
+          )}
+          {activeTab === "contracts" && <ContractsPanel customerId={selectedCustomerId} />}
+          {activeTab === "claims" && <DocumentSearchPanel />}
+          {activeTab === "calls" && (
+            <>
+              <CallsPanel customerId={selectedCustomerId} />
+              <div style={{ marginTop: 32 }}>
+                <RecordingsPanel customerId={selectedCustomerId} />
+              </div>
+            </>
+          )}
+          {activeTab === "contact-centre" && <ContactCentrePanel />}
+          {activeTab === "governance" && <CallGovernancePanel />}
+          {activeTab === "agent" && <CoWorkAgentPanel />}
+        </Suspense>
       </main>
     </div>
   )

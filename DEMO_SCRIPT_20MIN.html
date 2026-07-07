@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.10" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>AND.e Insurance Customer 360 — 20-Minute Demo Script</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">AND.e Insurance Customer 360 — 20-Minute Demo
+Script</h1>
+</header>
+<h1 id="and.e-insurance-customer-360-20-minute-demo-script">AND.e
+Insurance Customer 360 — 20-Minute Demo Script</h1>
+<h2 id="pre-demo-setup">Pre-Demo Setup</h2>
+<ul>
+<li>Ensure <code>ADHOC_WH</code> is running:
+<code>ALTER WAREHOUSE ADHOC_WH RESUME</code></li>
+<li>Open the app:
+https://edgb-sfseeurope-ie-demo10.snowflakecomputing.app</li>
+<li>Logged-in user shows “Colm Moynihan” with date/time and version in
+the top-left corner</li>
+<li>Have Snowsight open as backup</li>
+</ul>
+<hr />
+<h2 id="demo-flow-20-minutes">Demo Flow (20 minutes)</h2>
+<h3 id="opening-context-setting-2-minutes">1. Opening — Context Setting
+(2 minutes)</h3>
+<blockquote>
+<p>“What you’re looking at is a production Customer 360 application
+built entirely on Snowflake. It’s deployed as a Next.js app on Snowpark
+Container Services — no external hosting, no third-party
+infrastructure.</p>
+<p>This is an insurance company demo — AND.e Insurance — that unifies
+customer identity across three source systems:</p>
+<ul>
+<li><strong>Salesforce CRM</strong> — 6.5 million contacts</li>
+<li><strong>SAP Customer Master (KNA1)</strong> — 1,197 business
+accounts</li>
+<li><strong>Web interactions</strong> — form submissions, live chat,
+website activity</li>
+</ul>
+<p>The system uses Jaro-Winkler fuzzy matching to resolve duplicates —
+even when names are misspelled or data is incomplete — and presents a
+single golden record for each customer.</p>
+<p>Notice in the top-left: the logged-in user, today’s date and time,
+and the app version. This is a fully authenticated app running on
+SPCS.”</p>
+</blockquote>
+<p><strong>Point out the nav tabs:</strong> Home, Customer, Call
+Analytics, Calls by Agent, Red Flags, Policies, Claims, Agent</p>
+<hr />
+<h3 id="customer-search-identity-resolution-3-minutes">2. Customer
+Search — Identity Resolution (3 minutes)</h3>
+<p><strong>Action:</strong> Click <strong>Customer</strong> tab. The
+email field is pre-filled with <code>colm.moynihan@snowflake.com</code>.
+Click <strong>Search</strong>.</p>
+<blockquote>
+<p>“I’ll search for myself by email. The system resolves my identity
+across all source systems and shows the golden record — the best version
+of my data selected from 61 different records across Salesforce, SAP,
+and web forms.”</p>
+</blockquote>
+<p><strong>Point out:</strong> - Multiple name variants found: “Colm
+Moynihan”, “Colm W Moynihan”, “Moynihan Colm” - RECORD_COUNT showing how
+many source records were linked - Customer Summary: Total premiums,
+churn score, tier</p>
+<p><strong>Action:</strong> Click a customer row to see the full summary
+with churn analysis.</p>
+<blockquote>
+<p>“The churn score is calculated from five factors — call sentiment,
+number of policies, spend, tenure, and age. Each is weighted and scored
+out of 100. This customer is low risk with a score of 28.”</p>
+</blockquote>
+<p><strong>Show:</strong> Premium breakdown pie chart, dependents table,
+churn factor bar chart.</p>
+<p><strong>Action:</strong> Scroll down to see <strong>Duplicates
+Found</strong> section.</p>
+<blockquote>
+<p>“Below the summary, we see all the source system records that were
+fuzzy-matched into this cluster. Notice SAP has ‘Collum Moynihan’ — a
+misspelling — but the system still matched it with a 96% Jaro-Winkler
+similarity score.”</p>
+</blockquote>
+<hr />
+<h3 id="motor-policies-pdf-downloads-3-minutes">3. Motor Policies — PDF
+Downloads (3 minutes)</h3>
+<p><strong>Action:</strong> Click <strong>Policies</strong> tab. Email
+is pre-filled with <code>colm.moynihan@snowflake.com</code>. Results
+load automatically.</p>
+<blockquote>
+<p>“Here are Colm’s motor insurance policies. Two Toyota policies — a
+Corolla Comprehensive at EUR 1,245 and a RAV4 Third-Party Fire &amp;
+Theft at EUR 890. Both are active.”</p>
+</blockquote>
+<p><strong>Point out:</strong> - Policy values bar chart - Signature
+details (customer + provider signatures) - Status badges
+(Active/Expired) - <strong>Download PDF</strong> button on each
+policy</p>
+<p><strong>Action:</strong> Click <strong>Download PDF</strong> on the
+Toyota Corolla policy.</p>
+<blockquote>
+<p>“Each policy is stored as a full-text document on a Snowflake stage.
+We generate a presigned URL and the PDF downloads directly — no external
+file storage needed. The full policy text is also searchable by our AI
+agent.”</p>
+</blockquote>
+<hr />
+<h3 id="claims-search-date-filtering-and-pdf-export-3-minutes">4. Claims
+Search — Date Filtering and PDF Export (3 minutes)</h3>
+<p><strong>Action:</strong> Click <strong>Claims</strong> tab. Email
+defaults to <code>colm.moynihan@snowflake.com</code>. Adjust the
+<strong>Claim Date From</strong> to <code>2025-01-01</code> and click
+<strong>Search</strong>.</p>
+<blockquote>
+<p>“The Claims panel lets us search by Claim ID, customer name, email,
+or date range. Let me broaden the date range to see all of Colm’s
+claims.”</p>
+</blockquote>
+<p><strong>Results show 4 claims:</strong> - CLM-001: Reinsurance — EUR
+4,200 (Approved) - CLM-002: PPI — EUR 12,500 (Approved) - CLM-003:
+Private Motor Insurance — EUR 8,900 (Pending) - CLM-026: Commercial
+Motor Fleet — EUR 42,000 (Pending)</p>
+<p><strong>Point out:</strong> - Colour-coded claim types (Motor = blue,
+Commercial = orange, PPI = green, Reinsurance = purple) - Status badges
+(Approved/Pending) - Stats: Total claims count, total EUR value,
+approved count, pending count</p>
+<p><strong>Action:</strong> Click <strong>Download PDF</strong> on
+CLM-003.</p>
+<blockquote>
+<p>“Each claim can be exported as a PDF report — generated on the fly
+from the claim data. It includes all details: claim ID, customer, type,
+amount, status, and full description. Useful for compliance, audit
+trails, or sharing with adjusters.”</p>
+</blockquote>
+<hr />
+<h3 id="call-analytics-contact-centre-overview-2-minutes">5. Call
+Analytics — Contact Centre Overview (2 minutes)</h3>
+<p><strong>Action:</strong> Click <strong>Call Analytics</strong>
+tab.</p>
+<blockquote>
+<p>“This is the contact centre dashboard. We’re looking at aggregate
+call data across all agents — sentiment distribution, average call
+duration, calls per agent, and top keywords detected by AI.”</p>
+</blockquote>
+<p><strong>Point out:</strong> - Sentiment breakdown chart
+(Positive/Neutral/Negative split) - Calls per agent ranking - Top
+AI-detected keywords - Average handle time</p>
+<blockquote>
+<p>“All sentiment analysis is done using Cortex AI functions — no
+external ML services or GPU infrastructure. The keywords are extracted
+from call transcripts using AI_EXTRACT.”</p>
+</blockquote>
+<hr />
+<h3 id="calls-by-agent-audio-playback-and-download-3-minutes">6. Calls
+by Agent — Audio Playback and Download (3 minutes)</h3>
+<p><strong>Action:</strong> Click <strong>Calls by Agent</strong> tab.
+The Agent dropdown shows <code>&lt;All&gt;</code> by default.</p>
+<blockquote>
+<p>“We can filter calls by agent using this dropdown. Let me select a
+specific agent.”</p>
+</blockquote>
+<p><strong>Action:</strong> Select an agent from the dropdown (e.g.,
+“Patrick Murphy”). The call list filters instantly.</p>
+<blockquote>
+<p>“Now I can see just Patrick Murphy’s calls. Let me click on one with
+negative sentiment.”</p>
+</blockquote>
+<p><strong>Action:</strong> Click on a call with “Negative” sentiment
+(e.g., CALL-197).</p>
+<blockquote>
+<p>“Here’s the full call detail — agent, date, duration, type, and the
+AI-generated summary. The key thing here is we can actually <strong>play
+the recording</strong> directly in the browser.”</p>
+</blockquote>
+<p><strong>Action:</strong> Click play on the audio player.</p>
+<blockquote>
+<p>“The audio is stored on a Snowflake internal stage. We fetch it via a
+presigned URL and stream it with full seeking support. There’s also a
+<strong>Download Recording</strong> button if you need the file
+offline.”</p>
+</blockquote>
+<p><strong>Action:</strong> Scroll down to show the transcript and
+sentiment analysis.</p>
+<blockquote>
+<p>“Below we have the full transcript and sentiment breakdown. The
+transcript was generated using Cortex AI_TRANSCRIBE, and the sentiment
+scored automatically.”</p>
+</blockquote>
+<hr />
+<h3 id="red-flag-words-call-governance-2-minutes">7. Red Flag Words —
+Call Governance (2 minutes)</h3>
+<p><strong>Action:</strong> Click <strong>Red Flags</strong> tab.</p>
+<blockquote>
+<p>“This is the call governance panel. The system scans every call
+transcript for red-flag words across four categories: Profanity, Legal
+threats, Financial terms, and GDPR-related language.”</p>
+</blockquote>
+<p><strong>Point out:</strong> - Summary stats: total flagged calls,
+pending review, escalated - Word category breakdown - Individual flagged
+calls with context snippets - Review status
+(Pending/Reviewed/Escalated)</p>
+<blockquote>
+<p>“When a flag is detected, it shows the exact word matched, the
+category, and the surrounding context from the transcript. Compliance
+teams can review and mark as Reviewed or Escalate for further
+action.”</p>
+</blockquote>
+<p><strong>Action:</strong> Click the <strong>Download Word
+List</strong> button (PDF).</p>
+<blockquote>
+<p>“The complete red-flag word list is downloadable as a PDF — useful
+for training new agents or audit documentation.”</p>
+</blockquote>
+<hr />
+<h3 id="ai-agent-natural-language-queries-2-minutes">8. AI Agent —
+Natural Language Queries (2 minutes)</h3>
+<p><strong>Action:</strong> Click <strong>Agent</strong> tab. Select a
+model from the dropdown (e.g., “Claude Opus 4-8”). Click a sample
+question: “What Toyota vehicles does Colm Moynihan have insured?”</p>
+<blockquote>
+<p>“Our AND-E Agent uses Cortex Agent with both Cortex Search and data
+table tools. I can ask natural language questions about any customer
+data.”</p>
+</blockquote>
+<p><strong>Wait for response.</strong> Point out the metadata bar
+showing model name and timestamp.</p>
+<blockquote>
+<p>“Notice above the answer — it shows which model answered and exactly
+when the question was asked. This is important for audit trails and
+comparing model performance.”</p>
+</blockquote>
+<p><strong>Action:</strong> Ask a follow-up: “What is the excess on the
+Toyota Corolla policy?”</p>
+<blockquote>
+<p>“The agent searches the contract text semantically — it’s not doing
+keyword matching, it’s understanding the meaning of my question and
+finding the relevant clause in the policy document.”</p>
+</blockquote>
+<p><strong>Action:</strong> Ask: “Which customers have negative call
+sentiment?”</p>
+<blockquote>
+<p>“I can also query structured data. Here it’s running SQL against the
+calls table and returning results in a formatted card layout.”</p>
+</blockquote>
+<hr />
+<h3 id="dbt-pipeline-how-matching-works-optional-if-time-allows">9. dbt
+Pipeline — How Matching Works (optional, if time allows)</h3>
+<p><strong>Action:</strong> Open Snowsight worksheet.</p>
+<blockquote>
+<p>“Under the hood, the identity resolution runs as a dbt project
+deployed natively in Snowflake.”</p>
+</blockquote>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Show the 4-layer architecture</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> TABLE_SCHEMA, TABLE_NAME, ROW_COUNT</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> INFORMATION_SCHEMA.<span class="kw">TABLES</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> TABLE_CATALOG <span class="op">=</span> <span class="st">&#39;ANDE_DB&#39;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">AND</span> TABLE_SCHEMA <span class="kw">IN</span> (<span class="st">&#39;RAW&#39;</span>, <span class="st">&#39;CLEANSED&#39;</span>, <span class="st">&#39;MATCHED&#39;</span>, <span class="st">&#39;PUBLIC&#39;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">AND</span> TABLE_TYPE <span class="op">=</span> <span class="st">&#39;BASE TABLE&#39;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> TABLE_SCHEMA;</span></code></pre></div>
+<blockquote>
+<p>“RAW landing, CLEANSED standardisation, MATCHED fuzzy clustering, and
+PUBLIC golden records. The matching uses JAROWINKLER_SIMILARITY with
+weighted scoring across name (30%), email (30%), phone (20%), and
+address (20%).”</p>
+</blockquote>
+<hr />
+<h3 id="wrap-up-1-minute">10. Wrap-Up (1 minute)</h3>
+<blockquote>
+<p>“So what you’ve seen in 20 minutes is a complete insurance Customer
+360:</p>
+<ul>
+<li><strong>Identity resolution</strong> across 6.5M records using fuzzy
+matching</li>
+<li><strong>Motor policies</strong> with PDF documents and presigned
+downloads</li>
+<li><strong>Claims management</strong> with date filtering and
+on-the-fly PDF export</li>
+<li><strong>Call recordings</strong> — play, download, transcribe, and
+score sentiment</li>
+<li><strong>Red-flag governance</strong> — automated compliance scanning
+of every call</li>
+<li><strong>AI agent</strong> — natural language access to all customer
+data</li>
+<li><strong>dbt pipeline</strong> — auditable, column-level lineage from
+source to golden record</li>
+</ul>
+<p>All running entirely within Snowflake. No external ETL, no
+third-party hosting, no separate ML infrastructure. The app is a single
+Next.js container on SPCS.”</p>
+</blockquote>
+<hr />
+<h2 id="key-data-points-for-qa">Key Data Points for Q&amp;A</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Total unified records</td>
+<td>6,520,240+</td>
+</tr>
+<tr>
+<td>Salesforce contacts</td>
+<td>6,519,018</td>
+</tr>
+<tr>
+<td>SAP customers (KNA1)</td>
+<td>1,199</td>
+</tr>
+<tr>
+<td>Web interactions</td>
+<td>28</td>
+</tr>
+<tr>
+<td>Cross-system matches</td>
+<td>24,505+</td>
+</tr>
+<tr>
+<td>Golden records</td>
+<td>~6,496,731</td>
+</tr>
+<tr>
+<td>Match threshold</td>
+<td>60% weighted similarity</td>
+</tr>
+<tr>
+<td>Query performance</td>
+<td>&lt;1 second on golden table</td>
+</tr>
+<tr>
+<td>Deployment</td>
+<td>SPCS (CPU_X64_XS, 1 node)</td>
+</tr>
+<tr>
+<td>App framework</td>
+<td>Next.js 16 + React 19</td>
+</tr>
+<tr>
+<td>AI Services</td>
+<td>Cortex Agent, Cortex Search, AI_TRANSCRIBE, AI_EXTRACT</td>
+</tr>
+</tbody>
+</table>
+<h2 id="demo-customers">Demo Customers</h2>
+<table>
+<colgroup>
+<col style="width: 38%" />
+<col style="width: 61%" />
+</colgroup>
+<thead>
+<tr>
+<th>Customer</th>
+<th>Key Demo Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Colm Moynihan (colm.moynihan@snowflake.com)</td>
+<td>2 Toyota policies, 4 claims, fuzzy matching, 61 versions</td>
+</tr>
+<tr>
+<td>Dan Jones (dan.jones@snowflake.com)</td>
+<td>2 Lexus policies, email+phone linking, contract growth</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="faq">FAQ</h2>
+<p><strong>Q: Where is this running?</strong> A: Entirely on Snowflake —
+SPCS for the app, Cortex for AI, stages for documents/audio. No external
+services.</p>
+<p><strong>Q: How does fuzzy matching work?</strong> A: Jaro-Winkler
+similarity across name, email, phone, and address with weighted scoring.
+Threshold is 60%.</p>
+<p><strong>Q: What about real-time data?</strong> A: The architecture
+supports Snowpipe Streaming for sub-second ingestion. The demo shows
+batch-loaded data.</p>
+<p><strong>Q: How is the AI agent built?</strong> A: It’s a Cortex Agent
+with two tools — Cortex Search (semantic document search) and a data
+table tool (structured SQL queries). No custom model training.</p>
+<p><strong>Q: Can I download policy/claim documents?</strong> A: Yes —
+policies have pre-generated PDFs on a Snowflake stage (presigned URLs).
+Claims generate PDFs on-the-fly from the claim data via a server-side
+API route.</p>
+</body>
+</html>

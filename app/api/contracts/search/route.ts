@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     const safe = searchParams_json.replace(/'/g, "''")
     const rows = await querySnowflake(`
       SELECT SNOWFLAKE.CORTEX.SEARCH_PREVIEW(
-        'CUSTOMER_360.PUBLIC.CONTRACT_SEARCH_SERVICE',
+        'ANDE_DB.PUBLIC.CONTRACT_SEARCH_SERVICE',
         '${safe}'
       ) AS RESULT
     `)

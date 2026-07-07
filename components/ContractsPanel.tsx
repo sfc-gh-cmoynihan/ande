@@ -1,12 +1,13 @@
 "use client"
 import { useState, useEffect } from "react"
-import { FileText, Download, PenTool } from "lucide-react"
+import { FileText, Download, PenTool, Search } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts"
 
 interface Contract {
   CONTRACT_ID: string
   CONTRACT_TITLE: string
   CUSTOMER_NAME: string
+  MASTER_CUSTOMER_ID: string
   CONTRACT_DATE: string
   EXPIRY_DATE: string
   CONTRACT_VALUE: number
@@ -28,28 +29,47 @@ interface ContractsPanelProps {
 }
 
 export function ContractsPanel({ customerId }: ContractsPanelProps) {
-  const [idInput, setIdInput] = useState(customerId || "")
+  const [policyIdInput, setPolicyIdInput] = useState("")
   const [nameInput, setNameInput] = useState("")
+  const [idInput, setIdInput] = useState(customerId || "")
+  const [emailInput, setEmailInput] = useState("colm.moynihan@snowflake.com")
   const [contracts, setContracts] = useState<Contract[]>([])
   const [loading, setLoading] = useState(false)
 
-  const doSearch = async (id?: string) => {
-    const searchId = id || idInput
-    if (!searchId && !nameInput) return
+  const doSearch = async (overrides?: { id?: string; name?: string; email?: string }) => {
     setLoading(true)
-    const params = searchId ? `id=${encodeURIComponent(searchId)}` : `name=${encodeURIComponent(nameInput)}`
+    let params = ""
+    const searchId = overrides?.id || idInput
+    const searchName = overrides?.name || nameInput
+    const searchEmail = overrides?.email || emailInput
+    if (policyIdInput) {
+      params = `policyId=${encodeURIComponent(policyIdInput)}`
+    } else if (searchId) {
+      params = `id=${encodeURIComponent(searchId)}`
+    } else if (searchName) {
+      params = `name=${encodeURIComponent(searchName)}`
+    } else if (searchEmail) {
+      params = `email=${encodeURIComponent(searchEmail)}`
+    }
     const res = await fetch(`/api/contracts?${params}`)
     const data = await res.json()
-    setContracts(data)
+    setContracts(Array.isArray(data) ? data : [])
     setLoading(false)
   }
 
   useEffect(() => {
     if (customerId) {
       setIdInput(customerId)
-      doSearch(customerId)
+      doSearch({ id: customerId })
+    } else {
+      setEmailInput("colm.moynihan@snowflake.com")
+      doSearch({ email: "colm.moynihan@snowflake.com" })
     }
   }, [customerId])
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") doSearch()
+  }
 
   const chartData = contracts.map((c) => ({
     name: c.CONTRACT_TITLE.slice(0, 20),
@@ -62,34 +82,39 @@ export function ContractsPanel({ customerId }: ContractsPanelProps) {
   return (
     <div>
       <div className="page-header">
-        <h2>Signed Contracts</h2>
-        <p>View contracts with signature details and PDF downloads</p>
+        <h2>Motor Policies</h2>
+        <p>View motor insurance policies with signature details and PDF downloads</p>
       </div>
 
       <div className="card">
         <div className="search-row">
           <div className="input-group">
-            <label>Master Customer ID</label>
-            <input type="text" placeholder="e.g. MCR-00009001" value={idInput} onChange={(e) => setIdInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doSearch()} />
+            <label>Policy ID</label>
+            <input type="text" placeholder="e.g. POL-2025-LEXUS-001" value={policyIdInput} onChange={(e) => setPolicyIdInput(e.target.value)} onKeyDown={handleKeyDown} />
           </div>
           <div className="input-group">
-            <label>Or search by name</label>
-            <input type="text" placeholder="e.g. Colm Moynihan" value={nameInput} onChange={(e) => setNameInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doSearch()} />
+            <label>Customer Name</label>
+            <input type="text" placeholder="e.g. Colm Moynihan" value={nameInput} onChange={(e) => setNameInput(e.target.value)} onKeyDown={handleKeyDown} />
+          </div>
+
+          <div className="input-group">
+            <label>Customer Email</label>
+            <input type="text" placeholder="e.g. colm.moynihan@snowflake.com" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} onKeyDown={handleKeyDown} />
           </div>
         </div>
-        <button className="btn btn-primary" onClick={doSearch}>
-          <FileText size={14} /> Search Contracts
+        <button className="btn btn-primary" onClick={() => doSearch()}>
+          <Search size={14} /> Search Policies
         </button>
       </div>
 
-      {loading && <div className="loading"><div className="spinner" /> Loading contracts...</div>}
+      {loading && <div className="loading"><div className="spinner" /> Loading policies...</div>}
 
       {contracts.length > 0 && (
         <>
           <div className="stat-grid">
             <div className="stat-card">
               <div className="stat-value">{contracts.length}</div>
-              <div className="stat-label">Contracts</div>
+              <div className="stat-label">Policies</div>
             </div>
             <div className="stat-card">
               <div className="stat-value">EUR {totalValue.toLocaleString()}</div>
@@ -103,7 +128,7 @@ export function ContractsPanel({ customerId }: ContractsPanelProps) {
 
           {chartData.length > 1 && (
             <div className="chart-container">
-              <div className="card-title" style={{ marginBottom: 12 }}>Contract Values</div>
+              <div className="card-title" style={{ marginBottom: 12 }}>Policy Values</div>
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -132,9 +157,10 @@ export function ContractsPanel({ customerId }: ContractsPanelProps) {
                 </div>
               </div>
               <div className="contract-meta">
-                <span>ID: {c.CONTRACT_ID}</span>
+                <span>Policy: {c.CONTRACT_ID}</span>
                 <span>Period: {c.CONTRACT_DATE} to {c.EXPIRY_DATE}</span>
                 <span>Customer: {c.CUSTOMER_NAME}</span>
+                <span>ID: {c.MASTER_CUSTOMER_ID}</span>
               </div>
               <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <div>

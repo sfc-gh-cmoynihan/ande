@@ -12,7 +12,7 @@ async function getFileBuffer(file: string): Promise<ArrayBuffer> {
   if (!safe) throw new Error("Invalid file name")
 
   const rows = await querySnowflake(`
-    SELECT GET_PRESIGNED_URL(@CUSTOMER_360.PUBLIC.CALL_RECORDINGS_PUBLIC, '${safe}', 3600) AS URL
+    SELECT GET_PRESIGNED_URL(@ANDE_DB.PUBLIC.CALL_RECORDINGS_PUBLIC, '${safe}', 3600) AS URL
   `)
 
   if (rows.length === 0 || !rows[0].URL) throw new Error("File not found")

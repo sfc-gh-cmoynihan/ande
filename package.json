@@ -1,6 +1,6 @@
 {
   "name": "customer-360-app",
-  "version": "1.0.0",
+  "version": "6.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",

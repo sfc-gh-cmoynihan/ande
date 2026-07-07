@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Building, User, Shield, Users, Car, TrendingDown, Activity, Mail, Phone, Hash, Search as SearchIcon } from "lucide-react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts"
+import { VersionsPanel } from "@/components/VersionsPanel"
 
 interface SearchResult {
   MASTER_CUSTOMER_ID: string
@@ -209,7 +210,7 @@ export function SearchPanel({ onCustomerSelect }: SearchPanelProps) {
     <div>
       <div className="page-header">
         <h2>Customer Search</h2>
-        <p>Search by company or contact name across 6.5M unified records</p>
+        <p>Search by company or contact name across 156,651 unified records</p>
       </div>
 
       <div className="search-row">
@@ -481,6 +482,16 @@ export function SearchPanel({ onCustomerSelect }: SearchPanelProps) {
             </table>
           </div>
         </>
+      )}
+
+      {selectedCustomerId && (
+        <div style={{ marginTop: 24, borderTop: "1px solid var(--border)", paddingTop: 20 }}>
+          <div className="page-header" style={{ marginBottom: 0 }}>
+            <h2>Duplicates Found</h2>
+            <p>Source system records linked to this customer</p>
+          </div>
+          <VersionsPanel customerId={selectedCustomerId} embedded />
+        </div>
       )}
     </div>
   )

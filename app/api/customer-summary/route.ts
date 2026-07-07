@@ -82,29 +82,29 @@ export async function GET(request: Request) {
     const [contracts, dependents, calls, tenure, profile] = await Promise.all([
       querySnowflake(`
         SELECT CONTRACT_TITLE, CONTRACT_VALUE, STATUS
-        FROM CUSTOMER_360.PUBLIC.CUSTOMER_CONTRACTS
+        FROM ANDE_DB.PUBLIC.CUSTOMER_CONTRACTS
         WHERE MASTER_CUSTOMER_ID = '${safe}'
         ORDER BY CONTRACT_DATE DESC
       `),
       querySnowflake(`
         SELECT FULL_NAME, DATE_OF_BIRTH, GENDER, RELATIONSHIP, DRIVER_STATUS, LICENSE_TYPE
-        FROM CUSTOMER_360.PUBLIC.CUSTOMER_DEPENDENTS
+        FROM ANDE_DB.PUBLIC.CUSTOMER_DEPENDENTS
         WHERE MASTER_CUSTOMER_ID = '${safe}'
         ORDER BY DATE_OF_BIRTH
       `),
       querySnowflake(`
         SELECT SENTIMENT
-        FROM CUSTOMER_360.PUBLIC.CUSTOMER_CALLS
+        FROM ANDE_DB.PUBLIC.CUSTOMER_CALLS
         WHERE MASTER_CUSTOMER_ID = '${safe}'
       `),
       querySnowflake(`
         SELECT MIN(CREATED_DATE) AS FIRST_SEEN
-        FROM CUSTOMER_360.PUBLIC.CUSTOMER_MASTER
+        FROM ANDE_DB.PUBLIC.CUSTOMER_MASTER
         WHERE MASTER_CUSTOMER_ID = '${safe}'
       `),
       querySnowflake(`
         SELECT DATE_OF_BIRTH
-        FROM CUSTOMER_360.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE
+        FROM ANDE_DB.PUBLIC.CUSTOMER_MASTER_GOLDEN_TABLE
         WHERE MASTER_CUSTOMER_ID = '${safe}'
         LIMIT 1
       `)

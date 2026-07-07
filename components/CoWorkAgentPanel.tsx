@@ -21,16 +21,16 @@ const MODELS = [
 ]
 
 const SAMPLE_QUESTIONS = [
+  "What Toyota vehicles does Colm Moynihan have insured?",
+  "What is the excess on the Lexus RX policy?",
+  "Show me all motor insurance policies",
+  "What is Dan Jones covered for on his Lexus IS?",
   "What is the total value of all active contracts?",
-  "Show me contracts expiring in the next 30 days",
   "Which contracts have the highest value?",
   "What is the sentiment breakdown across all calls?",
-  "How many calls had negative sentiment?",
   "Show me top 10 customers by contract value",
-  "Which customers have the most source records?",
   "Which customers have negative call sentiment?",
-  "Which customers have expired contracts?",
-  "Find all contracts signed by Colm Moynihan",
+  "Does the Toyota Corolla policy include breakdown assistance?",
 ]
 
 function FormattedAnswer({ content }: { content: string }) {
@@ -143,10 +143,33 @@ export function CoWorkAgentPanel() {
   const [loading, setLoading] = useState(false)
   const [selectedModel, setSelectedModel] = useState("claude-opus-4-8")
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const preloadCache = useRef<Map<string, string>>(new Map())
+  const preloadingRef = useRef(false)
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
+
+  // Preload first 5 sample question answers on mount
+  useEffect(() => {
+    if (preloadingRef.current) return
+    preloadingRef.current = true
+    const questionsToPreload = SAMPLE_QUESTIONS.slice(0, 5)
+    questionsToPreload.forEach(async (q) => {
+      try {
+        const agentMessages = [{ role: "user", content: q }]
+        const res = await fetch("/api/ande-agent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: agentMessages }),
+        })
+        const data = await res.json()
+        if (data.answer) {
+          preloadCache.current.set(q, data.answer)
+        }
+      } catch {}
+    })
+  }, [])
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || loading) return
@@ -155,13 +178,32 @@ export function CoWorkAgentPanel() {
     setMessages(updated)
     setInput("")
     setLoading(true)
+    const askedAt = new Date().toLocaleString("en-IE", { dateStyle: "medium", timeStyle: "short" })
+    const modelLabel = MODELS.find(m => m.value === selectedModel)?.label || selectedModel
     try {
-      const apiMessages = updated.map(m => ({ role: m.role, content: [{ type: "text", text: m.content }] }))
-      const res = await fetch("/api/agent", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: apiMessages, model: selectedModel }) })
-      const data = await res.json()
-      setMessages([...updated, { role: "assistant", content: data.error ? `Error: ${data.error}` : (data.answer || "No response") }])
+      // Check preload cache first (only for first message in conversation)
+      const cached = updated.length === 1 ? preloadCache.current.get(text.trim()) : undefined
+      if (cached) {
+        const meta = `**Model:** ${modelLabel} | **Asked:** ${askedAt}`
+        setMessages([...updated, { role: "assistant", content: `${meta}\n\n${cached}` }])
+        return
+      }
+      // Try Agent first, fall back to SQL-based agent
+      const agentMessages = updated.map(m => ({ role: m.role, content: m.content }))
+      let res = await fetch("/api/ande-agent", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: agentMessages }) })
+      let data = await res.json()
+      if (res.status === 500 && data.error && !data.answer) {
+        // Fallback to SQL-based agent
+        const apiMessages = updated.map(m => ({ role: m.role, content: [{ type: "text", text: m.content }] }))
+        res = await fetch("/api/agent", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: apiMessages, model: selectedModel }) })
+        data = await res.json()
+      }
+      const answer = data.error ? `Error: ${data.error}` : (data.answer || "No response")
+      const meta = `**Model:** ${modelLabel} | **Asked:** ${askedAt}`
+      setMessages([...updated, { role: "assistant", content: `${meta}\n\n${answer}` }])
     } catch (err) {
-      setMessages([...updated, { role: "assistant", content: `Error: ${err instanceof Error ? err.message : "Unknown"}` }])
+      const meta = `**Model:** ${modelLabel} | **Asked:** ${askedAt}`
+      setMessages([...updated, { role: "assistant", content: `${meta}\n\nError: ${err instanceof Error ? err.message : "Unknown"}` }])
     } finally {
       setLoading(false)
     }
@@ -173,7 +215,8 @@ export function CoWorkAgentPanel() {
         <div style={{ flex: 1, overflowY: "auto", border: "1px solid var(--border)", borderRadius: 8, padding: 16, background: "white", marginBottom: 12 }}>
           {messages.length === 0 && (
             <div style={{ textAlign: "center", padding: 40, color: "#6c757d" }}>
-              Ask a question about customers, contracts, calls, or web activity
+              <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8, color: "#1a1a2e" }}>AND-E Agent</div>
+              <div>Ask about customers, contracts, insurance policies, calls, or documents</div>
             </div>
           )}
           {messages.map((msg, i) => {
@@ -249,10 +292,11 @@ export function CoWorkAgentPanel() {
           <div
             key={i}
             onClick={() => sendMessage(q)}
-            style={{ padding: "8px 12px", marginBottom: 6, background: "#fff", border: "1px solid #e0e0e0", borderRadius: 6, fontSize: 12, cursor: "pointer", transition: "all 0.2s" }}
+            style={{ padding: "8px 12px", marginBottom: 6, background: i < 5 ? "#f0fdf4" : "#fff", border: `1px solid ${i < 5 ? "#bbf7d0" : "#e0e0e0"}`, borderRadius: 6, fontSize: 12, cursor: "pointer", transition: "all 0.2s", position: "relative" }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = "#3b82f6"; e.currentTarget.style.color = "#3b82f6" }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e0e0"; e.currentTarget.style.color = "#1a1a2e" }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = i < 5 ? "#bbf7d0" : "#e0e0e0"; e.currentTarget.style.color = "#1a1a2e" }}
           >
+            {i < 5 && <span style={{ position: "absolute", top: 4, right: 6, fontSize: 9, color: "#16a34a", fontWeight: 600 }}>⚡</span>}
             {q}
           </div>
         ))}

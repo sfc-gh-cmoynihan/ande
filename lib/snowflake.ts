@@ -181,7 +181,7 @@ function baseConfig(): snowflake.ConnectionOptions {
   const application = "SnowflakeAppsDeploy"
   const base: snowflake.ConnectionOptions = { application }
   if (process.env.SNOWFLAKE_ACCOUNT) base.account = process.env.SNOWFLAKE_ACCOUNT
-  if (process.env.SNOWFLAKE_WAREHOUSE) base.warehouse = process.env.SNOWFLAKE_WAREHOUSE
+  base.warehouse = process.env.SNOWFLAKE_WAREHOUSE || "ADHOC_WH"
   if (process.env.SNOWFLAKE_ACCOUNT_URL) base.accessUrl = process.env.SNOWFLAKE_ACCOUNT_URL
   // SNOWFLAKE_HOST is commonly injected by eval/CI frameworks
   if (!base.accessUrl && process.env.SNOWFLAKE_HOST) {
@@ -531,9 +531,36 @@ function resolveLongRunningOpts(
   }
 }
 
+// --- In-memory query cache ---
+const queryCache = new Map<string, { data: Record<string, any>[]; expiry: number }>()
+const CACHE_TTL_MS = 60_000 // 60 seconds
+
+function getCached(key: string): Record<string, any>[] | null {
+  const entry = queryCache.get(key)
+  if (!entry) return null
+  if (Date.now() > entry.expiry) { queryCache.delete(key); return null }
+  return entry.data
+}
+
+function setCache(key: string, data: Record<string, any>[]): void {
+  queryCache.set(key, { data, expiry: Date.now() + CACHE_TTL_MS })
+}
+
 export async function querySnowflake(query: string, options: QueryOptions = {}): Promise<Record<string, any>[]> {
   const { callersRights = false } = options
+
+  // Check cache for non-caller-rights queries
+  if (!callersRights) {
+    const cached = getCached(query)
+    if (cached) {
+      sfLog(`cache hit (${cached.length} rows)`)
+      return cached
+    }
+  }
+
   const serviceToken = getServiceToken()
+
+  let result: Record<string, any>[]
 
   if (serviceToken) {
     if (callersRights) {
@@ -546,31 +573,31 @@ export async function querySnowflake(query: string, options: QueryOptions = {}):
       const combinedToken = serviceToken + "." + callerToken
       return queryWithPool(getCallersPool(combinedToken, serviceToken), query, "spcs-caller")
     }
-    return queryWithPool(getOwnersPool(serviceToken), query, "spcs-owner")
-  }
-
-  // Local dev: no SPCS token, so caller's rights is not possible.
-  if (callersRights) {
+    result = await queryWithPool(getOwnersPool(serviceToken), query, "spcs-owner")
+  } else if (callersRights) {
     console.warn("[snowflake] useCallersRights=true has no effect outside SPCS — using local dev credentials")
+    result = await queryWithPool(getPasswordPool(), query, "password")
+  } else if (process.env.SNOWFLAKE_USER && process.env.SNOWFLAKE_PASSWORD) {
+    result = await queryWithPool(getPasswordPool(), query, "password")
+  } else {
+    const tomlConn = readTomlDefaultConnection()
+    if (tomlConn) {
+      result = await queryWithPool(getTomlPool(tomlConn), query, "toml")
+    } else {
+      throw new Error(
+        "No Snowflake credentials found. Provide one of:\n" +
+        "  1. SPCS token file at /snowflake/session/token\n" +
+        "  2. SNOWFLAKE_USER + SNOWFLAKE_PASSWORD env vars\n" +
+        "  3. ~/.snowflake/config.toml with a default connection"
+      )
+    }
   }
 
-  // Explicit env vars: password auth via pooled connections
-  if (process.env.SNOWFLAKE_USER && process.env.SNOWFLAKE_PASSWORD) {
-    return queryWithPool(getPasswordPool(), query, "password")
+  // Store in cache
+  if (!callersRights) {
+    setCache(query, result)
   }
-
-  // ~/.snowflake/connections.toml or config.toml: use the default connection (local dev)
-  const tomlConn = readTomlDefaultConnection()
-  if (tomlConn) {
-    return queryWithPool(getTomlPool(tomlConn), query, "toml")
-  }
-
-  throw new Error(
-    "No Snowflake credentials found. Provide one of:\n" +
-    "  1. SPCS token file at /snowflake/session/token\n" +
-    "  2. SNOWFLAKE_USER + SNOWFLAKE_PASSWORD env vars\n" +
-      "  3. ~/.snowflake/config.toml with a default connection"
-  )
+  return result
 }
 
 /**
